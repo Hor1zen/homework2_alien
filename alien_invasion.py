@@ -2,6 +2,8 @@ import sys
 from time import sleep
 
 import pygame
+import pygame.mixer
+# 调用mixer模块
 
 from settings import Settings
 from game_stats import GameStats
@@ -41,6 +43,8 @@ class AlienInvasion:
 
         # Make the Play button.
         self.play_button = Button(self, "Play")
+
+        self._load_sounds()
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -118,6 +122,9 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            self._play_sound(self.laser_sound) # 播放激光音
+        else:
+            self._play_sound(self.no_laser) # 播放激光不足音效
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
@@ -140,6 +147,7 @@ class AlienInvasion:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+                self._play_sound(self.bomb_sound) # 播放单个敌人爆炸音
             self.sb.prep_score()
             self.sb.check_high_score()
 
@@ -149,12 +157,17 @@ class AlienInvasion:
             self._create_fleet()
             self.settings.increase_speed()
 
+            self._play_sound(self.correct_sound) # 播放一波敌人清除音
+
             # Increase level.
             self.stats.level += 1
             self.sb.prep_level()
 
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
+
+        self._play_sound(self.magic_sound)
+
         if self.stats.ships_left > 0:
             # Decrement ships_left, and update scoreboard.
             self.stats.ships_left -= 1
@@ -248,6 +261,30 @@ class AlienInvasion:
             self.play_button.draw_button()
 
         pygame.display.flip()
+
+    def _load_sounds(self):
+        # 加载所有声音
+        try:
+            self.bomb_sound = pygame.mixer.Sound('audio/bomb.mp3')
+            self.laser_sound = pygame.mixer.Sound('audio/laser2.mp3')
+            self.magic_sound = pygame.mixer.Sound('audio/magic5.mp3')
+            self.correct_sound = pygame.mixer.Sound('audio/correct_answer3.mp3')
+            self.no_laser = pygame.mixer.Sound('audio/blip04.mp3')
+        except pygame.error:
+            # 如果音频文件不存在或加载失败，则创建空对象避免出错
+            self.bomb_sound = None
+            self.laser_sound = None
+            self.magic_sound = None
+            self.correct_sound = None
+            self.no_laser = None
+
+    def _play_sound(self, sound):
+        # 播放声音
+        if sound:
+            try:
+                sound.play()
+            except pygame.error: #错误处理
+                pass
 
 
 if __name__ == '__main__':
