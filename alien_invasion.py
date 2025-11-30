@@ -146,7 +146,9 @@ class AlienInvasion:
 
         if collisions:
             for aliens in collisions.values():
-                self.stats.score += self.settings.alien_points * len(aliens)
+                points=self.settings.alien_points * len(aliens)
+                self.stats.score += points
+                self.sb.prep_score_animation(points)
                 self._play_sound(self.bomb_sound) # 播放单个敌人爆炸音
             self.sb.prep_score()
             self.sb.check_high_score()

@@ -25,6 +25,19 @@ class Scoreboard:
         self.prep_level()
         self.prep_ships()
 
+        # 添加动画属性
+        self.score_animation = 0
+        self.score_animation_y = 0
+        self.score_animation_text = ""
+
+    # 得分动画的准备
+    def prep_score_animation(self, points):
+        # 准备得分动画
+        self.score_animation = 30  # 动画持续30帧
+        self.score_animation_y = 0
+        self.score_animation_text = f"+{points}"
+
+
     def prep_score(self):
         """Turn the score into a rendered image."""
         rounded_score = round(self.stats.score, -1)
@@ -81,3 +94,17 @@ class Scoreboard:
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
         self.ships.draw(self.screen)
+
+        # 绘制得分动画
+        if self.score_animation > 0:
+            font = pygame.font.SysFont(None, 36)
+            text = font.render(self.score_animation_text, True, (255, 0, 0))
+            rect = text.get_rect()
+            # 调节“增加分数”显示的位置
+            rect.centerx = self.screen_rect.right * 7 // 8  # 3/8屏幕宽度位置
+            rect.y = self.score_rect.bottom + self.score_animation_y
+            self.screen.blit(text, rect)
+
+            # 更新动画状态
+            self.score_animation_y -= 1
+            self.score_animation -= 1
