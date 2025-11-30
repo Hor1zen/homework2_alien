@@ -1,4 +1,4 @@
-import pygame
+import pygame,random
 from pygame.sprite import Sprite
 
 class Bullet(Sprite):
@@ -9,7 +9,17 @@ class Bullet(Sprite):
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
-        self.color = self.settings.bullet_color
+
+        # 添加随机颜色选择（排除绿色）
+        colors = [
+            (255, 0, 0),  # 红色
+            (0, 0, 255),  # 蓝色
+            (255, 255, 0),  # 黄色
+            (255, 0, 255),  # 紫色
+            (0, 255, 255),  # 青色
+            (255, 165, 0)  # 橙色
+        ]
+        self.color = random.choice(colors)
 
         # Create a bullet rect at (0, 0) and then set correct position.
         self.rect = pygame.Rect(0, 0, self.settings.bullet_width,
